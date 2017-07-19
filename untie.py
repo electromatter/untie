@@ -214,7 +214,7 @@ class Untie:
     def find_knots(self):
         knots = []
         start = None
-        for i in range(1, self.n):
+        for i in range(self.n):
             j = (i + 1) % self.n
             if self.spin[i] > self.spin[j] and start is None:
                 # Keep track of decreasing spin
@@ -224,9 +224,12 @@ class Untie:
                 knots.append((start, i))
                 start = None
         else:
-            if start is not None and knots and knots[0][0] == 0:
-                # Merge knots that wrap around
-                knots[0] = (start, knots[0][1])
+            if start is not None:
+                if knots and knots[0][0] == 0:
+                    # Merge knots that wrap around
+                    knots[0] = (start, knots[0][1])
+                else:
+                    knots.append((start, 0))
         return set((i, j) for i, j in knots)
 
     def dplus(self, i, j):
@@ -282,7 +285,7 @@ class Untie:
             self.knots.append(Knot(self, knot))
 
     def step(self):
-        if not self.knots:
+        if not self.pairs:
             return False
 
         for knot in self.knots:
@@ -292,6 +295,11 @@ class Untie:
 
         # Find new knots
         self.find_new_knots()
+
+        if not self.knots and self.pairs:
+            print(self)
+            print(self.find_knots())
+            raise ValueError('pairs but no knots? BUG')
 
         self.finish_step()
         return bool(self.pairs)
