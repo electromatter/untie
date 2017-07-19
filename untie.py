@@ -18,14 +18,13 @@ def spin(perm):
 
 class Segment:
     def __init__(self, start, end, n):
-        start, end = start % n, end % n
-        self.start = start
-        self.end = end
         self.n = n
-        if start <= end:
-            self.len = end - start + 1
+        self.start = start % self.n
+        self.end = end % self.n
+        if self.start <= self.end:
+            self.len = self.end - self.start + 1
         else:
-            self.len = end - start + n + 1
+            self.len = self.end - self.start + self.n + 1
 
     def __len__(self):
         return self.len
@@ -47,13 +46,14 @@ class Segment:
     def sub_seg(self, other):
         # This could seriously be reduced to a few conditionals
         segments = self.split()
+
         for cut_start, cut_end in other.split():
             done = []
             # Apply cuts
             for seg_start, seg_end in segments:
-                if seg_start < cut_end < seg_end:
+                if seg_start < cut_end + 1 <= seg_end:
                     done.append((cut_end + 1, seg_end))
-                if seg_start < cut_start < seg_end:
+                if seg_start <= cut_start - 1 < seg_end:
                     done.append((seg_start, cut_start - 1))
                 if cut_end < seg_start or seg_end < cut_start:
                     done.append((seg_start, seg_end))
@@ -81,11 +81,9 @@ class Segment:
         return set(Segment(start, end, self.n) for start, end in segments)
 
     def split(self):
-        if self.start < self.end:
+        if self.start <= self.end:
             return [(self.start, self.end)]
-        if self.end == 0:
-            return [(self.start, self.n)]
-        return [(self.start, self.n),
+        return [(self.start, self.n - 1),
                 (0, self.end)]
 
     def __repr__(self):
