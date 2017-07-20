@@ -22,10 +22,10 @@ def main():
         try:
             perm = eval(input())
             print(perm, '=>', spin(perm))
-        except Exception:
-            print()
         except (KeyboardInterrupt, EOFError):
             break
+        except Exception:
+            print()
 
 if __name__ == '__main__':
     main()
